@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pipeline FY27 — Juan Camilo Ángel</title>
+<style>
+  :root{
+    /* Salesforce Lightning Design System */
+    --navy:#032D60;
+    --bg:#FAFAFA;
+    --surface:#FFFFFF;
+    --line:#E5E5E5;
+    --line2:#F0F0F0;
+    --txt:#181818;
+    --muted:#5C5C5C;
+    --lime:#0176D3;   /* Cloud Blue 50  - acento principal */
+    --blued:#014486;  /* Cloud Blue 30 */
+    --mint:#2E844A;   /* Green 50 */
+    --violet:#9050E9; /* Violet 50 */
+    --mag:#EA001E;    /* Red 50 */
+    --amber:#A05000;  /* Orange 20 - texto legible sobre blanco */
+    --shadow:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+    --r:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    background-image:
+      radial-gradient(900px 620px at 88% -6%, rgba(1,118,211,.09), transparent 62%),
+      radial-gradient(760px 520px at 8% 18%, rgba(6,165,154,.055), transparent 60%),
+      radial-gradient(900px 600px at 55% 104%, rgba(144,80,233,.05), transparent 62%);
+    background-attachment:fixed;
+    color:var(--txt);
+    font-family:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+  .wrap{max-width:1360px;margin:0 auto;padding:0 34px 74px}
+
+  /* ============ HEADER FIJO ============ */
+  header{
+    position:sticky;top:0;z-index:70;
+    background:rgba(255,255,255,.9);
+    backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+    border-bottom:1px solid var(--line);
+    box-shadow:0 1px 6px rgba(3,45,96,.05);
+  }
+  .hin{max-width:1360px;margin:0 auto;padding:22px 34px 0}
+  .hrow{display:flex;justify-content:space-between;align-items:flex-end;gap:26px;flex-wrap:wrap}
+  .hkpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:9px;margin:20px 0 4px}
+
+  /* ============ TABS ============ */
+  .tabs{display:flex;gap:2px;overflow-x:auto;margin-top:16px;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{
+    font-family:inherit;font-size:12.5px;font-weight:650;letter-spacing:-.1px;white-space:nowrap;
+    background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);
+    padding:12px 15px;cursor:pointer;transition:.16s;display:flex;align-items:center;gap:8px;
+  }
+  .tab i{font-style:normal;font-family:ui-monospace,monospace;font-size:10px;font-weight:700;color:#AEAEAE;transition:.16s}
+  .tab:hover{color:var(--navy)}
+  .tab:hover i{color:var(--muted)}
+  .tab.on{color:var(--lime);border-bottom-color:var(--lime)}
+  .tab.on i{color:var(--lime)}
+
+  /* ============ PANELES ============ */
+  .tp{display:none;padding:34px 0 6px}
+  .tp.on{display:block;animation:fade .34s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  h1{
+    font-size:clamp(25px,3.1vw,38px);font-weight:800;letter-spacing:-1.7px;line-height:1;
+    background:linear-gradient(105deg,var(--navy) 18%,#0B5CAB 62%,var(--lime) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  h1 em{
+    -webkit-text-fill-color:var(--muted);font-style:normal;display:block;
+    font-size:.37em;letter-spacing:-.1px;font-weight:500;margin-top:9px;
+  }
+  .stampbox{text-align:right}
+  .stamp{
+    display:inline-flex;align-items:center;gap:8px;border:1px solid #BFDDF5;
+    background:#EAF4FD;color:var(--blued);border-radius:999px;
+    font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;padding:6px 14px;
+  }
+  .stamp b{width:6px;height:6px;border-radius:50%;background:var(--lime)}
+  .stampbox p{font-size:11.5px;color:var(--muted);margin-top:11px}
+
+  /* ============ KPI ============ */
+  .k{
+    background:var(--surface);
+    border:1px solid var(--line);border-radius:12px;padding:13px 16px;
+    position:relative;overflow:hidden;transition:.2s;box-shadow:var(--shadow);
+  }
+  .k:hover{border-color:#C9C9C9;box-shadow:0 2px 8px rgba(3,45,96,.1)}
+  .k::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--violet)}
+  .k.m::before{background:var(--mint)} .k.l::before{background:var(--lime)}
+  .k.a::before{background:var(--amber)}
+  .k.g::before{background:var(--mag)} .k.v::before{background:var(--violet)}
+  .k .kl{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;min-height:2.1em;line-height:1.25}
+  .k .kv{font-size:clamp(17px,1.9vw,23px);font-weight:800;letter-spacing:-1.1px;margin-top:6px;line-height:1;color:var(--navy)}
+  .k .kn{font-size:10.5px;color:var(--muted);margin-top:5px}
+  .simtag{font-size:8px;letter-spacing:.14em;text-transform:uppercase;font-weight:800;color:#fff;background:var(--lime);padding:1px 5px;border-radius:4px;margin-left:4px;vertical-align:1px}
+  .cl{color:var(--lime)} .cm{color:var(--mint)} .cv{color:var(--violet)} .cg{color:var(--mag)} .ca{color:var(--amber)}
+
+  /* ============ SECTIONS ============ */
+  .sh{display:flex;align-items:center;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+  .sh i{
+    font-style:normal;font-family:ui-monospace,monospace;font-size:11px;font-weight:700;
+    color:var(--lime);background:#EAF4FD;border:1px solid #BFDDF5;
+    padding:4px 9px;border-radius:7px;
+  }
+  .sh h2{font-size:clamp(19px,2.2vw,25px);font-weight:750;letter-spacing:-.9px;color:var(--navy)}
+  .sh p{font-size:12.5px;color:var(--muted);margin-left:auto}
+
+  .panel{
+    background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--r);padding:24px;box-shadow:var(--shadow);
+  }
+
+  /* progress */
+  .ptop{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+  .ptop h3{font-size:14px;font-weight:700;letter-spacing:-.2px;color:var(--navy)}
+  .ptop .pct{font-size:38px;font-weight:800;letter-spacing:-2px;line-height:.9;color:var(--lime)}
+  .ptrack{height:26px;border-radius:999px;background:#EDEDED;overflow:hidden;position:relative;border:1px solid #E0E0E0}
+  .pfill{
+    height:100%;width:0;border-radius:999px;
+    background:linear-gradient(90deg,var(--mint),var(--lime));
+    transition:width 1.5s cubic-bezier(.2,1,.3,1);
+  }
+  .pgap{position:absolute;top:0;right:0;height:100%;display:flex;align-items:center;padding:0 16px;font-size:11.5px;font-weight:700;color:var(--mag);letter-spacing:.05em}
+  .pfoot{display:flex;justify-content:space-between;margin-top:11px;font-size:11px;color:var(--muted);font-weight:600;flex-wrap:wrap;gap:8px}
+
+  /* flags */
+  .flags{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:20px}
+  .flag{
+    background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--r);padding:17px 19px;box-shadow:var(--shadow);
+  }
+  .flag h4{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;display:flex;align-items:center;gap:9px;margin-bottom:8px}
+  .flag h4 b{width:8px;height:8px;border-radius:50%;flex:none}
+  .flag p{font-size:13.5px;color:#444444}
+  .flag p b{font-weight:700;color:var(--navy)}
+  .fm h4{color:var(--mint)} .fm h4 b{background:var(--mint)}
+  .fv h4{color:var(--violet)} .fv h4 b{background:var(--violet)}
+  .fg h4{color:var(--mag)} .fg h4 b{background:var(--mag)}
+  .fa h4{color:var(--amber)} .fa h4 b{background:var(--amber)}
+
+
+
+  /* table */
+  .toolbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:15px}
+  .fbtn{
+    font-family:inherit;font-size:11.5px;font-weight:650;letter-spacing:.04em;
+    padding:7px 14px;border:1px solid #D8D8D8;background:var(--surface);
+    color:var(--muted);border-radius:999px;cursor:pointer;transition:.15s;
+  }
+  .fbtn:hover{color:var(--lime);border-color:var(--lime)}
+  .fbtn.on{background:var(--lime);color:#fff;border-color:var(--lime);font-weight:750}
+  .tcount{margin-left:auto;font-size:12px;color:var(--muted);font-weight:600}
+  .tcount b{color:var(--navy);font-size:14px;font-weight:750}
+  .scroller{
+    overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);
+    background:var(--surface);box-shadow:var(--shadow);
+  }
+  table{width:100%;border-collapse:collapse;font-size:13px;min-width:900px}
+  thead th{
+    text-align:left;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--muted);font-weight:700;padding:14px 14px;white-space:nowrap;
+    border-bottom:1px solid var(--line);background:#F3F3F3;
+  }
+  thead th.sortable{cursor:pointer;user-select:none;transition:.15s}
+  thead th.sortable:hover{color:var(--lime)}
+  thead th.asc::after{content:" ▲";font-size:7px;color:var(--lime)}
+  thead th.desc::after{content:" ▼";font-size:7px;color:var(--lime)}
+  tbody td{padding:13px 14px;border-bottom:1px solid var(--line2);vertical-align:middle}
+  tbody tr{transition:background .15s}
+  tbody tr:hover{background:#F1F8FE}
+  tbody tr:last-child td{border-bottom:none}
+  .acct{font-weight:700;letter-spacing:-.25px;white-space:nowrap;color:var(--navy)}
+  .oname{color:var(--muted);font-size:12.5px}
+  .amt{text-align:right;font-weight:750;white-space:nowrap;letter-spacing:-.4px;color:var(--navy)}
+  .amt.zero{color:var(--mag)}
+  .dte{white-space:nowrap;color:var(--muted);font-size:12.5px}
+  .st{
+    display:inline-block;font-size:10px;font-weight:700;letter-spacing:.04em;
+    padding:4px 9px;border-radius:999px;white-space:nowrap;border:1px solid;
+  }
+  .s1{color:#5C5C5C;border-color:#D8D8D8;background:#F3F3F3}
+  .s2{color:#A05000;border-color:#F9C9A0;background:#FEF3E8}
+  .s3{color:#5A1BA9;border-color:#D6C2F5;background:#F5EFFE}
+  .s4{color:#1D6135;border-color:#B8E0C2;background:#EFF8F1}
+  .s5{color:#fff;border-color:var(--lime);background:var(--lime);font-weight:800}
+  .fcat{
+    display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+    padding:4px 9px;border-radius:7px;white-space:nowrap;border:1px solid;
+  }
+  .fc-commit{color:#1D6135;border-color:#B8E0C2;background:#EBF7EE}
+  .fc-best{color:#A05000;border-color:#F9C9A0;background:#FEF3E8}
+  .fc-pipe{color:#6B6B6B;border-color:var(--line);background:transparent;font-weight:600}
+  tfoot td{
+    padding:15px 14px;font-weight:750;font-size:13px;
+    border-top:1px solid var(--line);background:#EAF4FD;color:var(--blued);
+  }
+
+  /* ============ SIMULADOR ============ */
+  .simbar{
+    position:sticky;top:calc(var(--hh, 0px) + 10px);z-index:40;margin-bottom:18px;
+    background:linear-gradient(150deg,#EAF4FD,#F7FBFF);
+    border:1px solid #BFDDF5;border-radius:var(--r);padding:20px 22px;
+    backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    box-shadow:0 2px 10px rgba(3,45,96,.07);
+  }
+  .simgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:17px}
+  .sg small{display:block;font-size:9px;letter-spacing:.17em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .sg b{display:block;font-size:clamp(18px,2.1vw,25px);font-weight:800;letter-spacing:-1.1px;margin-top:6px;line-height:1;color:var(--navy)}
+  .sg span{display:block;font-size:10.5px;color:var(--muted);margin-top:5px}
+  .simtrack{height:22px;border-radius:999px;background:#E4EFF8;overflow:hidden;position:relative;border:1px solid #CFE3F5;display:flex}
+  .simbase{height:100%;background:linear-gradient(90deg,#2E844A,#41B658);transition:width .45s cubic-bezier(.2,1,.3,1)}
+  .simadd{height:100%;background:linear-gradient(90deg,var(--lime),#1B96FF);transition:width .45s cubic-bezier(.2,1,.3,1)}
+  .simmark{position:absolute;top:0;bottom:0;width:2px;background:rgba(3,45,96,.4);left:100%}
+  .simfoot{display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--muted);font-weight:600;flex-wrap:wrap;gap:8px}
+  .simfoot em{font-style:normal;color:var(--lime)}
+  .simfoot em.miss{color:var(--mag)}
+
+  .cbx{width:46px;text-align:center}
+  .chk{display:inline-flex;cursor:pointer;position:relative}
+  .chk input{position:absolute;opacity:0;width:0;height:0}
+  .chk span{
+    width:19px;height:19px;border-radius:6px;border:1.5px solid #AEAEAE;
+    background:#fff;display:block;transition:.15s;position:relative;
+  }
+  .chk:hover span{border-color:var(--lime)}
+  .chk input:checked + span{background:var(--lime);border-color:var(--lime)}
+  .chk input:checked + span::after{
+    content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;
+    border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg);
+  }
+  .chk input:focus-visible + span{outline:2px solid var(--lime);outline-offset:2px}
+  .oprow.sel{background:#EAF4FD}
+  .oprow.sel .acct{color:var(--lime)}
+  .oprow .acct label{cursor:pointer}
+  #simtbl{min-width:940px}
+
+  /* ============ BOARD POR ETAPA ============ */
+  .board{display:grid;grid-template-columns:repeat(5,minmax(216px,1fr));gap:12px;overflow-x:auto;padding-bottom:8px;margin-top:18px}
+  .bcol{background:#F6F7F9;border:1px solid var(--line);border-radius:12px;padding:12px 11px;min-width:216px;display:flex;flex-direction:column}
+  .bcol{border-top:3px solid #B0B0B0}
+  .bcol.mhi{border-top-color:#0176D3;background:#F2F8FE}
+  .bcol.k2{border-top-color:#DD7A01} .bcol.k3{border-top-color:#9050E9}
+  .bcol.k4{border-top-color:#2E844A} .bcol.k5{border-top-color:#0176D3}
+  .bch{padding:2px 3px 10px;border-bottom:1px solid var(--line);margin-bottom:10px}
+  .bch b{display:block;font-size:11.5px;font-weight:750;letter-spacing:-.2px;color:var(--navy)}
+  .bch span{display:block;font-size:10.5px;color:var(--muted);font-weight:600;margin-top:3px}
+  .bcards{display:flex;flex-direction:column;gap:8px}
+  .card{
+    background:var(--surface);border:1px solid var(--line);border-left:3px solid #B0B0B0;
+    border-radius:8px;padding:9px 11px;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:.15s;
+  }
+  .card:hover{border-color:#C9C9C9;box-shadow:0 2px 7px rgba(3,45,96,.1);transform:translateY(-1px)}
+  .card.k2{border-left-color:#DD7A01} .card.k3{border-left-color:#9050E9}
+  .card.k4{border-left-color:#2E844A} .card.k5{border-left-color:#0176D3}
+  .card b{display:block;font-size:12px;font-weight:750;letter-spacing:-.2px;color:var(--navy);line-height:1.25}
+  .card i{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.3}
+  .cardf{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px}
+  .cardf em{font-style:normal;font-size:12.5px;font-weight:800;letter-spacing:-.4px;color:var(--navy);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .cardf u{text-decoration:none;font-size:10px;color:var(--muted);font-weight:600;white-space:nowrap}
+  .card .tag{display:inline-block;font-size:8px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;padding:2px 5px;border-radius:4px;border:1px solid;margin-top:6px}
+  .tag.c{color:#1D6135;border-color:#B8E0C2;background:#EBF7EE}
+  .tag.bcase{color:#A05000;border-color:#F9C9A0;background:#FEF3E8}
+  .bempty{font-size:11px;color:#8A8A8A;padding:8px 3px}
+  @media(max-width:860px){ .board{grid-template-columns:repeat(5,minmax(200px,1fr))} }
+
+  /* ============ MAPA DE CUENTAS (TREEMAP) ============ */
+  .tmwrap{position:relative;width:100%;height:440px;border-radius:10px;overflow:hidden;background:#F6F7F9;border:1px solid var(--line)}
+  .tile{
+    position:absolute;overflow:hidden;border:2px solid #fff;border-radius:6px;
+    padding:9px 11px;color:#fff;transition:.16s;cursor:default;
+  }
+  .tile:hover{filter:brightness(1.1);z-index:5;box-shadow:0 3px 12px rgba(3,45,96,.25)}
+  .tile b{display:block;font-weight:750;letter-spacing:-.3px;line-height:1.15}
+  .tile em{display:block;font-style:normal;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:700;letter-spacing:-.4px;margin-top:3px;opacity:.95}
+  .tile u{display:block;text-decoration:none;font-size:10px;opacity:.82;margin-top:2px;font-weight:600}
+  .tile.xl b{font-size:16px} .tile.xl em{font-size:19px}
+  .tile.lg b{font-size:13px} .tile.lg em{font-size:15px}
+  .tile.md b{font-size:11.5px} .tile.md em{font-size:12.5px} .tile.md u{display:none}
+  .tile.sm{padding:6px 7px} .tile.sm b{font-size:10px} .tile.sm em{font-size:10.5px;margin-top:1px} .tile.sm u{display:none}
+  .tile.xs{padding:4px 5px} .tile.xs b{font-size:9px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden} .tile.xs em,.tile.xs u{display:none}
+  .tmlegend{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;font-size:11px;color:var(--muted);font-weight:600}
+  .tmlegend span{display:inline-flex;align-items:center;gap:6px}
+  .tmlegend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+  @media(max-width:860px){ .tmwrap{height:520px} }
+
+  .note{
+    border-left:3px solid var(--violet);background:#F7F3FE;
+    border-radius:0 11px 11px 0;padding:14px 18px;font-size:13.5px;color:#444444;margin-bottom:11px;
+  }
+  .note b{font-weight:700;color:var(--navy)}
+  .note.w{border-left-color:var(--mag);background:#FEF1F1}
+  .note.g{border-left-color:var(--mint);background:#EFF8F1}
+  footer{
+    margin-top:44px;padding:22px 0;border-top:1px solid var(--line);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+    font-size:11.5px;color:#6B6B6B;
+  }
+
+  @media(max-width:860px){
+    .wrap,.hin{padding-left:18px;padding-right:18px}
+    .flags{grid-template-columns:1fr}
+    .simgrid{grid-template-columns:repeat(2,1fr)}
+    .stampbox{text-align:left}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hin">
+    <div class="hrow">
+      <h1>Pipeline FY27<em>Juan Camilo Ángel · 24 oportunidades abiertas · 18 cuentas · sep 2026 – ene 2027</em></h1>
+      <div class="stampbox">
+        <span class="stamp"><b></b> Fuente de datos: Salesforce</span>
+        <p>Corte 23 sep 2026 · USD</p>
+      </div>
+    </div>
+
+    <div class="hkpi">
+      <div class="k v"><div class="kl">Plan FY27</div><div class="kv mono">$902,513</div><div class="kn">Meta anual</div></div>
+      <div class="k m"><div class="kl">YTD ACV</div><div class="kv mono cm" id="hYtd">$603,701</div><div class="kn" id="hYtdN">Cerrado a la fecha</div></div>
+      <div class="k l"><div class="kl">% del plan cerrado</div><div class="kv mono cl" id="hPct">67%</div><div class="kn" id="hPctN">$603,701 de $902,513</div></div>
+      <div class="k g"><div class="kl">To Plan</div><div class="kv mono cg" id="hGap">$298,812</div><div class="kn" id="hGapN">33% pendiente</div></div>
+      <div class="k l"><div class="kl">MultiYear Quota Attainment</div><div class="kv mono cl">207%</div><div class="kn">Sobre cuota multianual</div></div>
+      <div class="k a"><div class="kl">Attrition Quota Attainment</div><div class="kv mono ca">69%</div><div class="kn">Cuota de retención</div></div>
+      <div class="k l"><div class="kl">Pipeline</div><div class="kv mono cl">$1,057,941</div><div class="kn">24 opps · cobertura 3.5×</div></div>
+    </div>
+
+    <nav class="tabs" id="tabs">
+      <button class="tab on" data-t="plan"><i>01</i> Plan vs. YTD</button>
+      <button class="tab" data-t="etapas"><i>02</i> Etapas</button>
+      <button class="tab" data-t="tiempo"><i>03</i> Línea de tiempo</button>
+      <button class="tab" data-t="cuentas"><i>04</i> Mapa de cuentas</button>
+      <button class="tab" data-t="sim"><i>05</i> Simulador</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- 01 -->
+  <section class="tp on" id="tab-plan">
+    <div class="sh"><i>01</i><h2>Plan vs. YTD</h2><p>Attainment 66.9% · to go $298,812</p></div>
+
+    <div class="panel">
+      <div class="ptop">
+        <div>
+          <h3>Avance contra plan anual</h3>
+          <div class="mono" style="font-size:13px;color:var(--muted);margin-top:4px">$603,701 de $902,513</div>
+        </div>
+        <div class="pct mono">67%</div>
+      </div>
+      <div class="ptrack">
+        <div class="pfill" data-w="66.89"></div>
+        <div class="pgap">To go $298,812</div>
+      </div>
+      <div class="pfoot"><span>$0</span><span>$225K</span><span>$451K</span><span>$677K</span><span>$902,513</span></div>
+    </div>
+
+    <div class="flags">
+      <div class="flag fm">
+        <h4><b></b>Cobertura holgada</h4>
+        <p>El pipeline abierto de <b>$1,057,941</b> equivale a <b>3.5×</b> el to go. El estándar 3× exigiría <b>$896,436</b>: hay un 18% por encima de lo requerido.</p>
+      </div>
+      <div class="flag fv">
+        <h4><b></b>Etapas tardías ya alcanzan</h4>
+        <p>Solo las etapas <b>04 y 05</b> suman <b>$615,684</b> — 2.1× el to go. Si aterriza la mitad de ese bloque, el plan se cierra.</p>
+      </div>
+      <div class="flag fg">
+        <h4><b></b>Concentración fuerte</h4>
+        <p><b>Grupo Melo</b> aporta <b>$400,000</b> (37.8% del pipeline) en solo 2 oportunidades. Es la dependencia individual más grande del libro.</p>
+      </div>
+      <div class="flag fa">
+        <h4><b></b>Peso en etapa 01</h4>
+        <p><b>11 de 24</b> oportunidades (46%) siguen en «Identifying» con <b>$265,332</b> — 25.1% del valor aún sin calificar.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section class="tp" id="tab-etapas">
+    <div class="sh"><i>02</i><h2>Oportunidades por etapa</h2><p>Total $1,057,941 · 24 opps</p></div>
+
+
+    <!--GEN:board--><div class="board" id="board">
+        <div class="bcol k1">
+          <div class="bch"><b>01 · Identifying</b><span>11 opps · $265,332</span></div>
+          <div class="bcards">
+            <div class="card k1"><b>Banco Davivienda HN</b><i>NB — FSC</i><div class="cardf"><em>$80,000</em><u>30 oct 2026</u></div></div>
+            <div class="card k1"><b>Corporación Flores</b><i>NB — FSC +30</i><div class="cardf"><em>$58,500</em><u>29 ene 2027</u></div></div>
+            <div class="card k1"><b>Banco Guayaquil</b><i>NB — NetZeroCloud</i><div class="cardf"><em>$48,000</em><u>23 oct 2026</u></div></div>
+            <div class="card k1"><b>Bladex</b><i>NB — Agentforce</i><div class="cardf"><em>$40,000</em><u>30 oct 2026</u></div></div>
+            <div class="card k1"><b>Red Motors</b><i>SLK +135</i><div class="cardf"><em>$28,620</em><u>30 nov 2026</u></div></div>
+            <div class="card k1"><b>Cervecera de Nicaragua</b><i>Early renewal CCN Core</i><div class="cardf"><em>$4,632</em><u>31 dic 2026</u></div></div>
+            <div class="card k1"><b>Dicarina</b><i>Add-on — File and Data Storage</i><div class="cardf"><em>$2,388</em><u>18 oct 2026</u></div></div>
+            <div class="card k1"><b>Corporación Flores</b><i>Renewal Price Uplift</i><div class="cardf"><em>$1,638</em><u>29 oct 2026</u></div></div>
+            <div class="card k1"><b>Bavarian Motors (BMW PA)</b><i>AddOn — File Storage</i><div class="cardf"><em>$1,494</em><u>18 oct 2026</u></div></div>
+            <div class="card k1"><b>Agrisal</b><i>Renewal Price Uplift</i><div class="cardf"><em>$60</em><u>25 oct 2026</u></div></div>
+            <div class="card k1"><b>Banco Rural Honduras</b><i>NB — Financial Services Cloud</i><div class="cardf"><em>$0</em><u>18 dic 2026</u></div></div>
+          </div>
+        </div>
+        <div class="bcol k2">
+          <div class="bch"><b>02 · Determining Problem</b><span>4 opps · $107,682</span></div>
+          <div class="bcards">
+            <div class="card k2"><b>Banco del Austro</b><i>NB — Service + Agentforce</i><div class="cardf"><em>$45,000</em><u>18 dic 2026</u></div></div>
+            <div class="card k2"><b>Ricardo Pérez, S.A.</b><i>AddOn — Agentforce FlexCredits</i><div class="cardf"><em>$30,000</em><u>10 dic 2026</u></div></div>
+            <div class="card k2"><b>Motores Hino GT</b><i>NB — Slack</i><div class="cardf"><em>$18,000</em><u>22 ene 2027</u></div></div>
+            <div class="card k2"><b>Cofiño Stahl</b><i>NB — BYD Panamá</i><div class="cardf"><em>$14,682</em><u>31 ene 2027</u></div></div>
+          </div>
+        </div>
+        <div class="bcol k3">
+          <div class="bch"><b>03 · Validating Value</b><span>3 opps · $69,243</span></div>
+          <div class="bcards">
+            <div class="card k3"><b>Corporación Flores</b><i>NB — Loyalty</i><div class="cardf"><em>$33,000</em><u>14 ene 2027</u></div></div>
+            <div class="card k3"><b>Cervecera de Nicaragua</b><i>CCN — iACV Upgrade Loyalty + MCE+</i><div class="cardf"><em>$23,643</em><u>18 dic 2026</u></div></div>
+            <div class="card k3"><b>Motores Hino GT</b><i>Service Cloud</i><div class="cardf"><em>$12,600</em><u>17 dic 2026</u></div></div>
+          </div>
+        </div>
+        <div class="bcol k4">
+          <div class="bch"><b>04 · Value With Power</b><span>2 opps · $448,004</span></div>
+          <div class="bcards">
+            <div class="card k4"><b>Grupo Melo</b><i>Copanma — Bienes Raíces</i><div class="cardf"><em>$400,000</em><u>26 nov 2026</u></div></div>
+            <div class="card k4"><b>Banco Procredit</b><i>NB — Procredit EC +FSC / MC</i><div class="cardf"><em>$48,004</em><u>18 dic 2026</u></div></div>
+          </div>
+        </div>
+        <div class="bcol k5">
+          <div class="bch"><b>05 · Negotiating</b><span>4 opps · $167,680</span></div>
+          <div class="bcards">
+            <div class="card k5"><b>Corporación Flores</b><i>NB — AI ContactCenter Final</i><span class="tag bcase">Best Case</span><div class="cardf"><em>$75,000</em><u>30 sep 2026</u></div></div>
+            <div class="card k5"><b>Grupo Ferromax</b><i>Ferromax ITSM (ITSM Org)</i><span class="tag c">Commit</span><div class="cardf"><em>$40,000</em><u>30 sep 2026</u></div></div>
+            <div class="card k5"><b>Motores Hino GT</b><i>[PROCONTACTO] 5× Agentforce</i><div class="cardf"><em>$30,600</em><u>30 oct 2026</u></div></div>
+            <div class="card k5"><b>Metales Flix (Comeca)</b><i>NB [BDR]</i><div class="cardf"><em>$22,080</em><u>8 ene 2027</u></div></div>
+          </div>
+        </div>
+    </div><!--/GEN-->
+
+    <!--GEN:lectura--><div class="note" style="margin-top:18px"><b>Lectura:</b> el cuello del embudo está en las etapas intermedias: 02 y 03 suman solo <b>$176,925</b> (16.7% del pipeline), frente a $265,332 en 01 y $615,684 en 04+05. Ese hueco es lo que alimentaría el Q1 FY28.</div><!--/GEN-->
+  </section>
+
+  <!-- 03 -->
+  <section class="tp" id="tab-tiempo">
+    <div class="sh"><i>03</i><h2>Oportunidades por mes</h2><p>Fechas de cierre declaradas en SFDC</p></div>
+
+
+    <!--GEN:mboard--><div class="board" id="mboard">
+        <div class="bcol">
+          <div class="bch"><b>Sep 26</b><span>2 opps · $115,000 · 10.9%</span></div>
+          <div class="bcards">
+            <div class="card k5"><b>Corporación Flores</b><i>NB — AI ContactCenter Final</i><span class="tag bcase">Best Case</span><div class="cardf"><em>$75,000</em><u>30 sep 2026 · et. 05</u></div></div>
+            <div class="card k5"><b>Grupo Ferromax</b><i>Ferromax ITSM (ITSM Org)</i><span class="tag c">Commit</span><div class="cardf"><em>$40,000</em><u>30 sep 2026 · et. 05</u></div></div>
+          </div>
+        </div>
+        <div class="bcol">
+          <div class="bch"><b>Oct 26</b><span>8 opps · $204,180 · 19.3%</span></div>
+          <div class="bcards">
+            <div class="card k1"><b>Dicarina</b><i>Add-on — File and Data Storage</i><div class="cardf"><em>$2,388</em><u>18 oct 2026 · et. 01</u></div></div>
+            <div class="card k1"><b>Bavarian Motors (BMW PA)</b><i>AddOn — File Storage</i><div class="cardf"><em>$1,494</em><u>18 oct 2026 · et. 01</u></div></div>
+            <div class="card k1"><b>Banco Guayaquil</b><i>NB — NetZeroCloud</i><div class="cardf"><em>$48,000</em><u>23 oct 2026 · et. 01</u></div></div>
+            <div class="card k1"><b>Agrisal</b><i>Renewal Price Uplift</i><div class="cardf"><em>$60</em><u>25 oct 2026 · et. 01</u></div></div>
+            <div class="card k1"><b>Corporación Flores</b><i>Renewal Price Uplift</i><div class="cardf"><em>$1,638</em><u>29 oct 2026 · et. 01</u></div></div>
+            <div class="card k1"><b>Banco Davivienda HN</b><i>NB — FSC</i><div class="cardf"><em>$80,000</em><u>30 oct 2026 · et. 01</u></div></div>
+            <div class="card k1"><b>Bladex</b><i>NB — Agentforce</i><div class="cardf"><em>$40,000</em><u>30 oct 2026 · et. 01</u></div></div>
+            <div class="card k5"><b>Motores Hino GT</b><i>[PROCONTACTO] 5× Agentforce</i><div class="cardf"><em>$30,600</em><u>30 oct 2026 · et. 05</u></div></div>
+          </div>
+        </div>
+        <div class="bcol mhi">
+          <div class="bch"><b>Nov 26</b><span>2 opps · $428,620 · 40.5%</span></div>
+          <div class="bcards">
+            <div class="card k4"><b>Grupo Melo</b><i>Copanma — Bienes Raíces</i><div class="cardf"><em>$400,000</em><u>26 nov 2026 · et. 04</u></div></div>
+            <div class="card k1"><b>Red Motors</b><i>SLK +135</i><div class="cardf"><em>$28,620</em><u>30 nov 2026 · et. 01</u></div></div>
+          </div>
+        </div>
+        <div class="bcol">
+          <div class="bch"><b>Dic 26</b><span>7 opps · $163,879 · 15.5%</span></div>
+          <div class="bcards">
+            <div class="card k2"><b>Ricardo Pérez, S.A.</b><i>AddOn — Agentforce FlexCredits</i><div class="cardf"><em>$30,000</em><u>10 dic 2026 · et. 02</u></div></div>
+            <div class="card k3"><b>Motores Hino GT</b><i>Service Cloud</i><div class="cardf"><em>$12,600</em><u>17 dic 2026 · et. 03</u></div></div>
+            <div class="card k4"><b>Banco Procredit</b><i>NB — Procredit EC +FSC / MC</i><div class="cardf"><em>$48,004</em><u>18 dic 2026 · et. 04</u></div></div>
+            <div class="card k2"><b>Banco del Austro</b><i>NB — Service + Agentforce</i><div class="cardf"><em>$45,000</em><u>18 dic 2026 · et. 02</u></div></div>
+            <div class="card k3"><b>Cervecera de Nicaragua</b><i>CCN — iACV Upgrade Loyalty + MCE+</i><div class="cardf"><em>$23,643</em><u>18 dic 2026 · et. 03</u></div></div>
+            <div class="card k1"><b>Banco Rural Honduras</b><i>NB — Financial Services Cloud</i><div class="cardf"><em>$0</em><u>18 dic 2026 · et. 01</u></div></div>
+            <div class="card k1"><b>Cervecera de Nicaragua</b><i>Early renewal CCN Core</i><div class="cardf"><em>$4,632</em><u>31 dic 2026 · et. 01</u></div></div>
+          </div>
+        </div>
+        <div class="bcol">
+          <div class="bch"><b>Ene 27</b><span>5 opps · $146,262 · 13.8%</span></div>
+          <div class="bcards">
+            <div class="card k5"><b>Metales Flix (Comeca)</b><i>NB [BDR]</i><div class="cardf"><em>$22,080</em><u>8 ene 2027 · et. 05</u></div></div>
+            <div class="card k3"><b>Corporación Flores</b><i>NB — Loyalty</i><div class="cardf"><em>$33,000</em><u>14 ene 2027 · et. 03</u></div></div>
+            <div class="card k2"><b>Motores Hino GT</b><i>NB — Slack</i><div class="cardf"><em>$18,000</em><u>22 ene 2027 · et. 02</u></div></div>
+            <div class="card k1"><b>Corporación Flores</b><i>NB — FSC +30</i><div class="cardf"><em>$58,500</em><u>29 ene 2027 · et. 01</u></div></div>
+            <div class="card k2"><b>Cofiño Stahl</b><i>NB — BYD Panamá</i><div class="cardf"><em>$14,682</em><u>31 ene 2027 · et. 02</u></div></div>
+          </div>
+        </div>
+    </div><!--/GEN-->
+
+    <!--GEN:prox--><div class="note w" style="margin-top:18px"><b>Cierre más próximo:</b> 2 oportunidades con fecha <b>30 sep 2026</b> por <b>$115,000</b> — <b>Corporación Flores</b> · NB — AI ContactCenter Final — $75,000 (etapa 05 · Best Case); <b>Grupo Ferromax</b> · Ferromax ITSM (ITSM Org) — $40,000 (etapa 05 · Commit).</div><!--/GEN-->
+    <div class="note"><b>Concentración por mes:</b> noviembre $428,620, octubre $204,180 y diciembre $163,879 concentran el 75% del pipeline; el mes más grande es noviembre. Noviembre es el más frágil: la única de Grupo Melo ($400,000) es el <b>93%</b> de ese mes.</div>
+  </section>
+
+  <!-- 04 -->
+  <section class="tp" id="tab-cuentas">
+    <div class="sh"><i>04</i><h2>Mapa de cuentas</h2><p>Área proporcional al valor · color por etapa dominante</p></div>
+
+    <div class="panel">
+      <!--GEN:tm--><div class="tmwrap" id="treemap">
+        <div class="tile xl" style="left:0.000%;top:0.000%;width:37.809%;height:100.000%;background:#2E844A" title="Grupo Melo · $400,000 · 37.8% del pipeline · 1 opp"><b>Grupo Melo</b><em>$400,000</em><u>37.8% · 1 opp</u></div>
+        <div class="tile lg" style="left:37.809%;top:0.000%;width:23.455%;height:67.760%;background:#0176D3" title="Corporación Flores · $168,138 · 15.9% del pipeline · 4 opps"><b>Corporación Flores</b><em>$168,138</em><u>15.9% · 4 opps</u></div>
+        <div class="tile md" style="left:37.809%;top:67.760%;width:23.455%;height:32.240%;background:#747474" title="Banco Davivienda HN · $80,000 · 7.6% del pipeline · 1 opp"><b>Banco Davivienda HN</b><em>$80,000</em><u>7.6% · 1 opp</u></div>
+        <div class="tile md" style="left:61.264%;top:0.000%;width:14.859%;height:38.930%;background:#0176D3" title="Motores Hino GT · $61,200 · 5.8% del pipeline · 3 opps"><b>Motores Hino GT</b><em>$61,200</em><u>5.8% · 3 opps</u></div>
+        <div class="tile md" style="left:61.264%;top:38.930%;width:14.859%;height:30.536%;background:#2E844A" title="Banco Procredit · $48,004 · 4.5% del pipeline · 1 opp"><b>Banco Procredit</b><em>$48,004</em><u>4.5% · 1 opp</u></div>
+        <div class="tile md" style="left:61.264%;top:69.467%;width:14.859%;height:30.533%;background:#747474" title="Banco Guayaquil · $48,000 · 4.5% del pipeline · 1 opp"><b>Banco Guayaquil</b><em>$48,000</em><u>4.5% · 1 opp</u></div>
+        <div class="tile md" style="left:76.124%;top:0.000%;width:12.640%;height:33.650%;background:#B35C00" title="Banco del Austro · $45,000 · 4.3% del pipeline · 1 opp"><b>Banco del Austro</b><em>$45,000</em><u>4.3% · 1 opp</u></div>
+        <div class="tile sm" style="left:88.764%;top:0.000%;width:11.236%;height:33.650%;background:#747474" title="Bladex · $40,000 · 3.8% del pipeline · 1 opp"><b>Bladex</b><em>$40,000</em><u>3.8% · 1 opp</u></div>
+        <div class="tile sm" style="left:76.124%;top:33.650%;width:13.644%;height:27.712%;background:#0176D3" title="Grupo Ferromax · $40,000 · 3.8% del pipeline · 1 opp"><b>Grupo Ferromax</b><em>$40,000</em><u>3.8% · 1 opp</u></div>
+        <div class="tile sm" style="left:89.767%;top:33.650%;width:10.233%;height:27.712%;background:#B35C00" title="Ricardo Pérez, S.A. · $30,000 · 2.8% del pipeline · 1 opp"><b>Ricardo Pérez, S.A.</b><em>$30,000</em><u>2.8% · 1 opp</u></div>
+        <div class="tile sm" style="left:76.124%;top:61.362%;width:13.919%;height:19.436%;background:#747474" title="Red Motors · $28,620 · 2.7% del pipeline · 1 opp"><b>Red Motors</b><em>$28,620</em><u>2.7% · 1 opp</u></div>
+        <div class="tile sm" style="left:76.124%;top:80.799%;width:13.919%;height:19.201%;background:#8944E0" title="Cervecera de Nicaragua · $28,274 · 2.7% del pipeline · 2 opps"><b>Cervecera de Nicaragua</b><em>$28,274</em><u>2.7% · 2 opps</u></div>
+        <div class="tile sm" style="left:90.042%;top:61.362%;width:9.958%;height:20.959%;background:#0176D3" title="Metales Flix (Comeca) · $22,080 · 2.1% del pipeline · 1 opp"><b>Metales Flix (Comeca)</b><em>$22,080</em><u>2.1% · 1 opp</u></div>
+        <div class="tile xs" style="left:90.042%;top:82.321%;width:7.850%;height:17.679%;background:#B35C00" title="Cofiño Stahl · $14,682 · 1.4% del pipeline · 1 opp"><b>Cofiño Stahl</b><em>$14,682</em><u>1.4% · 1 opp</u></div>
+        <div class="tile xs" style="left:97.892%;top:82.321%;width:2.108%;height:10.709%;background:#747474" title="Dicarina · $2,388 · 0.2% del pipeline · 1 opp"><b>Dicarina</b><em>$2,388</em><u>0.2% · 1 opp</u></div>
+        <div class="tile xs" style="left:97.892%;top:93.031%;width:2.108%;height:6.700%;background:#747474" title="Bavarian Motors (BMW PA) · $1,494 · 0.1% del pipeline · 1 opp"><b>Bavarian Motors (BMW PA)</b><em>$1,494</em><u>0.1% · 1 opp</u></div>
+        <div class="tile xs" style="left:97.892%;top:99.731%;width:2.108%;height:0.269%;background:#747474" title="Agrisal · $60 · 0.0% del pipeline · 1 opp"><b>Agrisal</b><em>$60</em><u>0.0% · 1 opp</u></div>
+        <div class="tile xs" style="left:100.000%;top:99.731%;width:0.000%;height:0.269%;background:#747474" title="Banco Rural Honduras · $0 · 0.0% del pipeline · 1 opp"><b>Banco Rural Honduras</b><em>$0</em><u>0.0% · 1 opp</u></div>
+      </div><!--/GEN-->
+      <!--GEN:leg--><div class="tmlegend" id="tmlegend"><span><i style="background:#747474"></i>01 Identifying</span><span><i style="background:#B35C00"></i>02 Problem</span><span><i style="background:#8944E0"></i>03 Value</span><span><i style="background:#2E844A"></i>04 Power</span><span><i style="background:#0176D3"></i>05 Negotiating</span><span style="margin-left:auto">18 cuentas · $1,057,941</span></div><!--/GEN-->
+    </div>
+
+    <div class="note w" style="margin-top:18px"><b>Top 3 = 61.3% del pipeline.</b> Melo, Flores y Banco Davivienda HN concentran $648,138 en 6 oportunidades. Es apalancamiento —tres relaciones profundas— y riesgo a la vez: si Melo se corre de trimestre, noviembre pierde el 93% de su valor.</div>
+  </section>
+
+
+
+  <!-- 05 -->
+  <section class="tp" id="tab-sim">
+    <div class="sh"><i>05</i><h2>Simulador</h2><p>24 opps · marca las que cierran sí o sí y proyecta el attainment</p></div>
+
+    <div class="simbar">
+      <div class="simgrid">
+        <div class="sg"><small>YTD ACV actual</small><b class="mono cm">$603,701</b><span>Cerrado a la fecha</span></div>
+        <div class="sg"><small>Marcado como cierre</small><b class="mono cl" id="simSel">$0</b><span id="simSelN">0 oportunidades</span></div>
+        <div class="sg"><small>YTD ACV proyectado</small><b class="mono" id="simTot">$603,701</b><span id="simPct">67% del plan</span></div>
+        <div class="sg"><small>Falta para el plan</small><b class="mono cg" id="simGap">$298,812</b><span>Plan $902,513</span></div>
+      </div>
+      <div class="simtrack">
+        <div class="simbase" id="simBase" style="width:0"></div>
+        <div class="simadd" id="simAdd" style="width:0"></div>
+      </div>
+      <div class="simfoot">
+        <span>$0</span>
+        <span id="simMsg">Selecciona oportunidades para proyectar el attainment</span>
+        <span>Plan $902,513</span>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button class="fbtn on" data-f="all">Todas</button>
+      <button class="fbtn" data-f="1">01 Identifying</button>
+      <button class="fbtn" data-f="2">02 Problem</button>
+      <button class="fbtn" data-f="3">03 Value</button>
+      <button class="fbtn" data-f="4">04 Power</button>
+      <button class="fbtn" data-f="5">05 Negotiating</button>
+      <span class="tcount"><b id="cnt">24</b> opps · <b id="sum" class="mono">$1,057,941</b></span>
+    </div>
+
+    <div class="toolbar" style="margin-top:-4px">
+      <span style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.1em;text-transform:uppercase">Marcar cierre</span>
+      <button class="fbtn" data-sim="commit">Commit</button>
+      <button class="fbtn" data-sim="late">Etapas 04 + 05</button>
+      <button class="fbtn" data-sim="all">Todas</button>
+      <button class="fbtn" data-sim="none">Limpiar</button>
+    </div>
+
+    <div class="scroller">
+      <table id="simtbl">
+        <thead>
+          <tr>
+            <th class="cbx">✓</th>
+            <th class="sortable" data-k="acct">Cuenta</th>
+            <th>Oportunidad</th>
+            <th class="sortable" data-k="stage">Etapa</th>
+            <th class="sortable" data-k="fcat">Forecast</th>
+            <th class="sortable" data-k="amt" style="text-align:right">Monto USD</th>
+            <th class="sortable" data-k="date">Cierre</th>
+          </tr>
+        </thead>
+        <tbody id="simbody">
+          <tr class="oprow" data-date="2026-10-25" data-acct="Agrisal" data-key="agrisal-renewal-price-uplift" data-amt="60" data-s="1" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op0"><span></span></label></td><td class="acct"><label for="op0">Agrisal</label></td><td class="oname">Renewal Price Uplift</td><td><span class="st s1">01 Identifying</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">60</td><td class="dte mono">25 oct 2026</td></tr>
+          <tr class="oprow" data-date="2026-10-30" data-acct="Banco Davivienda HN" data-key="banco-davivienda-hn-nb-fsc" data-amt="80000" data-s="1" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op1"><span></span></label></td><td class="acct"><label for="op1">Banco Davivienda HN</label></td><td class="oname">NB — FSC</td><td><span class="st s1">01 Identifying</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">80,000</td><td class="dte mono">30 oct 2026</td></tr>
+          <tr class="oprow" data-date="2026-12-18" data-acct="Banco del Austro" data-key="banco-del-austro-nb-service-agentforce" data-amt="45000" data-s="2" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op2"><span></span></label></td><td class="acct"><label for="op2">Banco del Austro</label></td><td class="oname">NB — Service + Agentforce</td><td><span class="st s2">02 Problem</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">45,000</td><td class="dte mono">18 dic 2026</td></tr>
+          <tr class="oprow" data-date="2026-10-23" data-acct="Banco Guayaquil" data-key="banco-guayaquil-nb-netzerocloud" data-amt="48000" data-s="1" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op3"><span></span></label></td><td class="acct"><label for="op3">Banco Guayaquil</label></td><td class="oname">NB — NetZeroCloud</td><td><span class="st s1">01 Identifying</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">48,000</td><td class="dte mono">23 oct 2026</td></tr>
+          <tr class="oprow" data-date="2026-12-18" data-acct="Banco Procredit" data-key="banco-procredit-nb-procredit-ec-fsc-mc" data-amt="48004.5" data-s="4" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op4"><span></span></label></td><td class="acct"><label for="op4">Banco Procredit</label></td><td class="oname">NB — Procredit EC +FSC / MC</td><td><span class="st s4">04 Power</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">48,004.50</td><td class="dte mono">18 dic 2026</td></tr>
+          <tr class="oprow" data-date="2026-12-18" data-acct="Banco Rural Honduras" data-key="banco-rural-honduras-nb-financial-services-cloud" data-amt="0" data-s="1" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op5"><span></span></label></td><td class="acct"><label for="op5">Banco Rural Honduras</label></td><td class="oname">NB — Financial Services Cloud</td><td><span class="st s1">01 Identifying</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono zero">sin monto</td><td class="dte mono">18 dic 2026</td></tr>
+          <tr class="oprow" data-date="2026-10-18" data-acct="Bavarian Motors (BMW PA)" data-key="bavarian-motors-bmw-pa-addon-file-storage" data-amt="1494" data-s="1" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op6"><span></span></label></td><td class="acct"><label for="op6">Bavarian Motors (BMW PA)</label></td><td class="oname">AddOn — File Storage</td><td><span class="st s1">01 Identifying</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">1,494</td><td class="dte mono">18 oct 2026</td></tr>
+          <tr class="oprow" data-date="2026-10-30" data-acct="Bladex" data-key="bladex-nb-agentforce" data-amt="40000" data-s="1" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op7"><span></span></label></td><td class="acct"><label for="op7">Bladex</label></td><td class="oname">NB — Agentforce</td><td><span class="st s1">01 Identifying</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">40,000</td><td class="dte mono">30 oct 2026</td></tr>
+          <tr class="oprow" data-date="2026-12-18" data-acct="Cervecera de Nicaragua" data-key="cervecera-de-nicaragua-ccn-iacv-upgrade-loyalty-mce" data-amt="23642.52" data-s="3" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op8"><span></span></label></td><td class="acct"><label for="op8">Cervecera de Nicaragua</label></td><td class="oname">CCN — iACV Upgrade Loyalty + MCE+</td><td><span class="st s3">03 Value</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">23,642.52</td><td class="dte mono">18 dic 2026</td></tr>
+          <tr class="oprow" data-date="2026-12-31" data-acct="Cervecera de Nicaragua" data-key="cervecera-de-nicaragua-early-renewal-ccn-core" data-amt="4631.79" data-s="1" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op9"><span></span></label></td><td class="acct"><label for="op9">Cervecera de Nicaragua</label></td><td class="oname">Early renewal CCN Core</td><td><span class="st s1">01 Identifying</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">4,631.79</td><td class="dte mono">31 dic 2026</td></tr>
+          <tr class="oprow" data-date="2027-01-31" data-acct="Cofiño Stahl" data-key="cofino-stahl-nb-byd-panama" data-amt="14682" data-s="2" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op10"><span></span></label></td><td class="acct"><label for="op10">Cofiño Stahl</label></td><td class="oname">NB — BYD Panamá</td><td><span class="st s2">02 Problem</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">14,682</td><td class="dte mono">31 ene 2027</td></tr>
+          <tr class="oprow" data-date="2026-09-30" data-acct="Corporación Flores" data-key="corporacion-flores-nb-ai-contactcenter-final" data-amt="75000" data-s="5" data-fcat="2"><td class="cbx"><label class="chk"><input type="checkbox" id="op11"><span></span></label></td><td class="acct"><label for="op11">Corporación Flores</label></td><td class="oname">NB — AI ContactCenter Final</td><td><span class="st s5">05 Negotiating</span></td><td><span class="fcat fc-best">Best Case</span></td><td class="amt mono">75,000</td><td class="dte mono">30 sep 2026</td></tr>
+          <tr class="oprow" data-date="2027-01-29" data-acct="Corporación Flores" data-key="corporacion-flores-nb-fsc-30" data-amt="58500" data-s="1" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op12"><span></span></label></td><td class="acct"><label for="op12">Corporación Flores</label></td><td class="oname">NB — FSC +30</td><td><span class="st s1">01 Identifying</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">58,500</td><td class="dte mono">29 ene 2027</td></tr>
+          <tr class="oprow" data-date="2027-01-14" data-acct="Corporación Flores" data-key="corporacion-flores-nb-loyalty" data-amt="33000" data-s="3" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op13"><span></span></label></td><td class="acct"><label for="op13">Corporación Flores</label></td><td class="oname">NB — Loyalty</td><td><span class="st s3">03 Value</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">33,000</td><td class="dte mono">14 ene 2027</td></tr>
+          <tr class="oprow" data-date="2026-10-29" data-acct="Corporación Flores" data-key="corporacion-flores-renewal-price-uplift" data-amt="1638" data-s="1" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op14"><span></span></label></td><td class="acct"><label for="op14">Corporación Flores</label></td><td class="oname">Renewal Price Uplift</td><td><span class="st s1">01 Identifying</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">1,638</td><td class="dte mono">29 oct 2026</td></tr>
+          <tr class="oprow" data-date="2026-10-18" data-acct="Dicarina" data-key="dicarina-add-on-file-and-data-storage" data-amt="2388" data-s="1" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op15"><span></span></label></td><td class="acct"><label for="op15">Dicarina</label></td><td class="oname">Add-on — File and Data Storage</td><td><span class="st s1">01 Identifying</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">2,388</td><td class="dte mono">18 oct 2026</td></tr>
+          <tr class="oprow" data-date="2026-09-30" data-acct="Grupo Ferromax" data-key="grupo-ferromax-ferromax-itsm-itsm-org" data-amt="39999.99" data-s="5" data-fcat="1"><td class="cbx"><label class="chk"><input type="checkbox" id="op16"><span></span></label></td><td class="acct"><label for="op16">Grupo Ferromax</label></td><td class="oname">Ferromax ITSM (ITSM Org)</td><td><span class="st s5">05 Negotiating</span></td><td><span class="fcat fc-commit">Commit</span></td><td class="amt mono">39,999.99</td><td class="dte mono">30 sep 2026</td></tr>
+          <tr class="oprow" data-date="2026-11-26" data-acct="Grupo Melo" data-key="grupo-melo-copanma-bienes-raices" data-amt="400000" data-s="4" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op18"><span></span></label></td><td class="acct"><label for="op18">Grupo Melo</label></td><td class="oname">Copanma — Bienes Raíces</td><td><span class="st s4">04 Power</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">400,000</td><td class="dte mono">26 nov 2026</td></tr>
+          <tr class="oprow" data-date="2027-01-08" data-acct="Metales Flix (Comeca)" data-key="metales-flix-comeca-nb-bdr" data-amt="22080" data-s="5" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op19"><span></span></label></td><td class="acct"><label for="op19">Metales Flix (Comeca)</label></td><td class="oname">NB [BDR]</td><td><span class="st s5">05 Negotiating</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">22,080</td><td class="dte mono">8 ene 2027</td></tr>
+          <tr class="oprow" data-date="2026-10-30" data-acct="Motores Hino GT" data-key="motores-hino-gt-procontacto-5-agentforce" data-amt="30600" data-s="5" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op20"><span></span></label></td><td class="acct"><label for="op20">Motores Hino GT</label></td><td class="oname">[PROCONTACTO] 5× Agentforce</td><td><span class="st s5">05 Negotiating</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">30,600</td><td class="dte mono">30 oct 2026</td></tr>
+          <tr class="oprow" data-date="2027-01-22" data-acct="Motores Hino GT" data-key="motores-hino-gt-nb-slack" data-amt="18000" data-s="2" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op21"><span></span></label></td><td class="acct"><label for="op21">Motores Hino GT</label></td><td class="oname">NB — Slack</td><td><span class="st s2">02 Problem</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">18,000</td><td class="dte mono">22 ene 2027</td></tr>
+          <tr class="oprow" data-date="2026-12-17" data-acct="Motores Hino GT" data-key="motores-hino-gt-service-cloud" data-amt="12600" data-s="3" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op22"><span></span></label></td><td class="acct"><label for="op22">Motores Hino GT</label></td><td class="oname">Service Cloud</td><td><span class="st s3">03 Value</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">12,600</td><td class="dte mono">17 dic 2026</td></tr>
+          <tr class="oprow" data-date="2026-11-30" data-acct="Red Motors" data-key="red-motors-slk-135" data-amt="28620" data-s="1" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op23"><span></span></label></td><td class="acct"><label for="op23">Red Motors</label></td><td class="oname">SLK +135</td><td><span class="st s1">01 Identifying</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">28,620</td><td class="dte mono">30 nov 2026</td></tr>
+          <tr class="oprow" data-date="2026-12-10" data-acct="Ricardo Pérez, S.A." data-key="ricardo-perez-s-a-addon-agentforce-flexcredits" data-amt="30000" data-s="2" data-fcat="3"><td class="cbx"><label class="chk"><input type="checkbox" id="op24"><span></span></label></td><td class="acct"><label for="op24">Ricardo Pérez, S.A.</label></td><td class="oname">AddOn — Agentforce FlexCredits</td><td><span class="st s2">02 Problem</span></td><td><span class="fcat fc-pipe">Pipeline</span></td><td class="amt mono">30,000</td><td class="dte mono">10 dic 2026</td></tr>
+        </tbody>
+        <tfoot>
+          <tr><td colspan="5">Total visible</td><td class="amt mono" id="tfsum">1,057,940.80</td><td class="mono" id="tfcnt">24 opps</td></tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="note" style="margin-top:18px"><b>Cómo leerlo:</b> la barra verde es el YTD ACV ya cerrado ($603,701); la azul es lo que agregarías si cierran las oportunidades marcadas. La selección se guarda en este navegador y no modifica Salesforce.</div>
+  </section>
+
+  <div class="note w" style="margin-top:38px"><b>Aviso:</b> contenido generado con IA a partir de los datos provistos; puede contener errores. Totales, porcentajes y coberturas son cálculos derivados, no campos de Salesforce. Verificar antes de usar en un forecast oficial.</div>
+
+  <footer>
+    <span>Pipeline FY27 · Juan Camilo Ángel</span>
+    <span>Corte 23 sep 2026 · USD · Documento interno</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var animated = {};
+
+  function animate(panel){
+    if(!panel) return;
+    panel.querySelectorAll('[data-w]').forEach(function(el){
+      el.style.width = '0'; setTimeout(function(){ el.style.width = el.dataset.w + '%'; }, 90);
+    });
+    panel.querySelectorAll('[data-h]').forEach(function(el){
+      el.style.height = '0'; setTimeout(function(){ el.style.height = el.dataset.h + '%'; }, 90);
+    });
+  }
+
+  function show(id){
+    document.querySelectorAll('.tp').forEach(function(p){ p.classList.toggle('on', p.id === 'tab-' + id); });
+    document.querySelectorAll('.tab').forEach(function(b){ b.classList.toggle('on', b.dataset.t === id); });
+    animate(document.getElementById('tab-' + id));
+    if(location.hash.slice(1) !== id) history.replaceState(null, '', '#' + id);
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  document.querySelectorAll('.tab').forEach(function(b){
+    b.addEventListener('click', function(){ show(b.dataset.t); });
+  });
+
+  // navegacion con flechas
+  document.addEventListener('keydown', function(e){
+    if(e.target.tagName === 'INPUT' || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+    var i = tabs.findIndex(function(t){ return t.classList.contains('on'); });
+    var n = e.key === 'ArrowRight' ? i + 1 : i - 1;
+    if(n >= 0 && n < tabs.length) show(tabs[n].dataset.t);
+  });
+
+  var start = location.hash.slice(1);
+  if(start && document.getElementById('tab-' + start)) show(start);
+  else animate(document.getElementById('tab-plan'));
+
+  /* ---------- tabla unica (filtros + orden) ---------- */
+  var tb   = document.querySelector('#simtbl tbody');
+  var rows = Array.prototype.slice.call(tb.querySelectorAll('tr'));
+  var fmt  = function(n){ return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var cur  = 'all';
+
+  function refresh(){
+    var n = 0, s = 0;
+    rows.forEach(function(r){
+      var vis = (cur === 'all' || r.dataset.s === cur);
+      r.style.display = vis ? '' : 'none';
+      if(vis){ n++; s += parseFloat(r.dataset.amt); }
+    });
+    document.getElementById('cnt').textContent = n;
+    document.getElementById('sum').textContent = '$' + Math.round(s).toLocaleString('en-US');
+    document.getElementById('tfsum').textContent = fmt(s);
+    document.getElementById('tfcnt').textContent = n + (n === 1 ? ' opp' : ' opps');
+  }
+
+  document.querySelectorAll('.fbtn[data-f]').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.fbtn[data-f]').forEach(function(x){ x.classList.remove('on'); });
+      b.classList.add('on');
+      cur = b.dataset.f;
+      refresh();
+    });
+  });
+
+  var dir = {};
+  document.querySelectorAll('th.sortable').forEach(function(th){
+    th.addEventListener('click', function(){
+      var k = th.dataset.k;
+      dir[k] = (dir[k] === 'asc') ? 'desc' : 'asc';
+      document.querySelectorAll('th.sortable').forEach(function(x){ x.classList.remove('asc','desc'); });
+      th.classList.add(dir[k]);
+      var sign = dir[k] === 'asc' ? 1 : -1;
+      rows.sort(function(a,b){
+        var va, vb;
+        if(k === 'amt'){ va = parseFloat(a.dataset.amt); vb = parseFloat(b.dataset.amt); }
+        else if(k === 'date'){ va = a.dataset.date; vb = b.dataset.date; }
+        else if(k === 'stage'){ va = a.dataset.s; vb = b.dataset.s; }
+        else if(k === 'fcat'){ va = a.dataset.fcat; vb = b.dataset.fcat; }
+        else { va = a.dataset.acct.toLowerCase(); vb = b.dataset.acct.toLowerCase(); }
+        return va < vb ? -sign : va > vb ? sign : 0;
+      });
+      rows.forEach(function(r){ tb.appendChild(r); });
+    });
+  });
+
+  refresh();
+
+  /* alto real del header para el sticky del simulador */
+  function hh(){
+    var h = document.querySelector('header');
+    if(h) document.documentElement.style.setProperty('--hh', h.offsetHeight + 'px');
+  }
+  hh(); window.addEventListener('resize', hh);
+
+  /* ---------- simulador ---------- */
+  var PLAN = 902513, BASE = 603701;
+  var money = function(n){ return '$' + Math.round(n).toLocaleString('en-US'); };
+  var simRows = rows;
+
+  function simCalc(){
+    var add = 0, n = 0;
+    simRows.forEach(function(r){
+      var on = r.querySelector('input').checked;
+      r.classList.toggle('sel', on);
+      if(on){ add += parseFloat(r.dataset.amt); n++; }
+    });
+    var tot = BASE + add, pct = tot / PLAN * 100, gap = Math.max(0, PLAN - tot);
+
+    document.getElementById('simSel').textContent  = money(add);
+    document.getElementById('simSelN').textContent = n + (n === 1 ? ' oportunidad' : ' oportunidades');
+    document.getElementById('simTot').textContent  = money(tot);
+    document.getElementById('simTot').className    = 'mono ' + (tot >= PLAN ? 'cl' : 'cm');
+    document.getElementById('simPct').textContent  = pct.toFixed(0) + '% del plan';
+    document.getElementById('simGap').textContent  = gap > 0 ? money(gap) : 'Plan cubierto';
+    document.getElementById('simGap').className    = 'mono ' + (gap > 0 ? 'cg' : 'cl');
+
+    document.getElementById('simBase').style.width = Math.min(100, BASE / PLAN * 100) + '%';
+    document.getElementById('simAdd').style.width  = Math.min(100 - BASE / PLAN * 100, add / PLAN * 100) + '%';
+
+    var msg = document.getElementById('simMsg');
+    if(n === 0) msg.innerHTML = 'Selecciona oportunidades para proyectar el attainment';
+    else if(gap > 0) msg.innerHTML = 'Attainment proyectado <em>' + pct.toFixed(1) + '%</em> · faltan <em class="miss">' + money(gap) + '</em>';
+    else msg.innerHTML = 'Plan cubierto · <em>' + pct.toFixed(1) + '%</em> de attainment (+' + money(tot - PLAN) + ')';
+
+    // refleja la proyeccion en el header
+    var hv = document.getElementById('hYtd'), hn = document.getElementById('hYtdN');
+    var gv = document.getElementById('hGap'), gn = document.getElementById('hGapN');
+    var pv = document.getElementById('hPct'), pn = document.getElementById('hPctN');
+    if(n > 0){
+      hv.textContent = money(tot); hv.className = 'kv mono cl';
+      hn.innerHTML = 'Proyectado <b class="simtag">sim</b>';
+      pv.textContent = pct.toFixed(0) + '%';
+      pn.innerHTML = money(tot) + ' de ' + money(PLAN) + ' <b class="simtag">sim</b>';
+      gv.textContent = gap > 0 ? money(gap) : '$0';
+      gn.innerHTML = (gap > 0 ? (gap / PLAN * 100).toFixed(0) + '% pendiente' : 'Plan cubierto') + ' <b class="simtag">sim</b>';
+    } else {
+      hv.textContent = '$603,701'; hv.className = 'kv mono cm';
+      hn.textContent = 'Cerrado a la fecha';
+      pv.textContent = '67%'; pn.textContent = '$603,701 de $902,513';
+      gv.textContent = '$298,812'; gn.textContent = '33% pendiente';
+    }
+
+    try{
+      localStorage.setItem('fy27sim', JSON.stringify(
+        simRows.filter(function(r){ return r.querySelector('input').checked; }).map(function(r){ return r.dataset.key; })
+      ));
+    }catch(e){}
+  }
+
+  simRows.forEach(function(r){ r.querySelector('input').addEventListener('change', simCalc); });
+
+  document.querySelectorAll('.fbtn[data-sim]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var m = b.dataset.sim;
+      simRows.forEach(function(r){
+        var i = r.querySelector('input');
+        if(m === 'all') i.checked = true;
+        else if(m === 'none') i.checked = false;
+        else if(m === 'commit') i.checked = (r.dataset.fcat === '1');
+        else if(m === 'late') i.checked = (r.dataset.s === '4' || r.dataset.s === '5');
+      });
+      simCalc();
+    });
+  });
+
+  try{
+    var saved = JSON.parse(localStorage.getItem('fy27sim') || '[]');
+    if(Array.isArray(saved) && typeof saved[0] === 'string'){
+      simRows.forEach(function(r){ r.querySelector('input').checked = saved.indexOf(r.dataset.key) !== -1; });
+    }
+  }catch(e){}
+  simCalc();
+})();
+</script>
+</body>
+</html>
